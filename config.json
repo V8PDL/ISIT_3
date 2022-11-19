@@ -14,5 +14,8 @@
 	"plot_size": 1000,
 	"happiness_cup": 2,
 	"gif_path": "gif.gif",
-	"cells_path": "cells.txt"
+	"cells_path": "cells.txt",
+	"generate_images": true,
+	"generate_gif": true,
+	"write_text_logs": false
 }
