@@ -1,0 +1,18 @@
+{
+	"iterations_count": 10000,
+	"snapshots_frequency": 50,
+	"temp_folder": "temp",
+	"white_rate": 0.45,
+	"black_rate": 0.45,
+	"colors_dict": 
+	{
+		"white": [255, 255, 255],
+		"black": [0, 0, 0],
+		"empty": [192, 192, 192]
+	},
+	"array_size": 100,
+	"plot_size": 1000,
+	"happiness_cup": 2,
+	"gif_path": "gif.gif",
+	"cells_path": "cells.txt"
+}
