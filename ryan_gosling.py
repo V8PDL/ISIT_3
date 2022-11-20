@@ -153,14 +153,13 @@ class Matrix:
             self.save_image(iteration)
             return False
         choice(self.unhappy_cells).exchange_places()
+        if iteration % int(self.iterations_count / 100) == 0:
+            print(f"{int(iteration / self.iterations_count * 100)}% is done")
         if iteration % self.snapshots_frequency == 0:
-            if iteration % int(self.iterations_count / 100) == 0:
-                print(f"{int(iteration / self.iterations_count * 100)}% is done")
             self.save_image(iteration)
             if self.write_text_logs:
-                cells_to_text = str.join(";", [cell.to_string() for cell in self.all_cells])
                 with open(f"{self.temp_folder}{sep}{self.cells_path}", "a") as cells_file:
-                    cells_file.write(f"\nMatrix on iteration {iteration}:\n{cells_to_text}\n")
+                    cells_file.write(f"\nMatrix on iteration {iteration}:\n{self.to_string()}\n")
         return True
 
     def make_gif(self):
