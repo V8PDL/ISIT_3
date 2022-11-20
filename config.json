@@ -1,5 +1,5 @@
 {
-	"iterations_count": 10000,
+	"iterations_count": 100000,
 	"snapshots_frequency": 50,
 	"temp_folder": "temp",
 	"white_rate": 0.45,
@@ -12,10 +12,12 @@
 	},
 	"array_size": 100,
 	"plot_size": 1000,
-	"happiness_cup": 2,
+	"happiness_cup": 5,
 	"gif_path": "gif.gif",
 	"cells_path": "cells.txt",
+	"seconds_for_frame": 0.05,
 	"generate_images": true,
 	"generate_gif": true,
-	"write_text_logs": false
+	"write_text_logs": false,
+	"write_diffs": false
 }
