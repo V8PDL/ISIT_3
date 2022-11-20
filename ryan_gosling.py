@@ -54,6 +54,46 @@ class Matrix:
         self.happy_cells = [cell for cell in self.all_cells if cell.is_happy]
         self.empty_cells = [cell for cell in self.all_cells if cell.color == "empty"]
 
+    def get_cell_by_xy(self, x: int, y: int) -> Cell:
+        if x < 0 or y < 0 or x >= self.size or y >= self.size:
+            return self.Cell(matrix, 0, 1)
+        return self.all_cells[x * self.size + y]
+
+    def get_image(self) -> Image:
+        image = Image.new("RGBA", (self.plot_size, self.plot_size), self.colors_dict["empty"])
+        draw = ImageDraw.Draw(image)
+        [draw.rectangle(
+            [cell.position_x * self.step, cell.position_y * self.step, (cell.position_x + 1) * self.step, (cell.position_y + 1) * self.step],
+            fill=self.colors_dict[cell.color])
+        for cell in self.all_cells]
+        return image
+
+    def save_image(self, iteration:int = 0):
+        self.get_image().save(f"{self.temp_folder}{sep}{iteration}.png", "png", save_all=True)
+
+    def iterate(self, iteration: int = 0) -> bool:
+        if len(self.unhappy_cells) == 0:
+            print("Everyone is happy")
+            self.save_image(iteration)
+            return False
+        choice(self.unhappy_cells).exchange_places()
+        if iteration % int(self.iterations_count / 100) == 0:
+            print(f"{int(iteration / self.iterations_count * 100)}% is done")
+        if iteration % self.snapshots_frequency == 0:
+            self.save_image(iteration)
+            if self.write_text_logs:
+                with open(f"{self.temp_folder}{sep}{self.cells_path}", "a") as cells_file:
+                    cells_file.write(f"\nMatrix on iteration {iteration}:\n{self.to_string()}\n")
+        return True
+
+    def make_gif(self):
+        images = sorted([image_path for image_path in listdir(self.temp_folder) if image_path.endswith(".png")], key=lambda i: int(i[:-4]))
+        with get_writer(self.gif_path, mode="I", duration=self.seconds_for_frame) as writer:
+            [writer.append_data(imread(f"{self.temp_folder}{sep}{image}")) for image in images]
+
+    def to_string(self) -> str:
+        return str.join(";", [cell.to_string() for cell in self.all_cells])
+
     class Cell:
 
         matrix:Matrix
@@ -130,52 +170,12 @@ class Matrix:
         def to_string(self) -> str:
             return f"[{self.position}]{self.position_x}:{self.position_y} = {self.color} ({self.is_happy})"
 
-    def get_cell_by_xy(self, x: int, y: int) -> Cell:
-        if x < 0 or y < 0 or x >= self.size or y >= self.size:
-            return self.Cell(matrix, 0, 1)
-        return self.all_cells[x * self.size + y]
-
-    def get_image(self) -> Image:
-        image = Image.new("RGBA", (self.plot_size, self.plot_size), self.colors_dict["empty"])
-        draw = ImageDraw.Draw(image)
-        [draw.rectangle(
-            [cell.position_x * self.step, cell.position_y * self.step, (cell.position_x + 1) * self.step, (cell.position_y + 1) * self.step],
-            fill=self.colors_dict[cell.color])
-        for cell in self.all_cells]
-        return image
-
-    def save_image(self, iteration:int = 0):
-        self.get_image().save(f"{self.temp_folder}{sep}{iteration}.png", "png", save_all=True)
-
-    def iterate(self, iteration: int = 0) -> bool:
-        if len(self.unhappy_cells) == 0:
-            print("Everyone is happy")
-            self.save_image(iteration)
-            return False
-        choice(self.unhappy_cells).exchange_places()
-        if iteration % int(self.iterations_count / 100) == 0:
-            print(f"{int(iteration / self.iterations_count * 100)}% is done")
-        if iteration % self.snapshots_frequency == 0:
-            self.save_image(iteration)
-            if self.write_text_logs:
-                with open(f"{self.temp_folder}{sep}{self.cells_path}", "a") as cells_file:
-                    cells_file.write(f"\nMatrix on iteration {iteration}:\n{self.to_string()}\n")
-        return True
-
-    def make_gif(self):
-        images = sorted([image_path for image_path in listdir(self.temp_folder) if image_path.endswith(".png")], key=lambda i: int(i[:-4]))
-        with get_writer(self.gif_path, mode="I", duration=self.seconds_for_frame) as writer:
-            [writer.append_data(imread(f"{self.temp_folder}{sep}{image}")) for image in images]
-
-    def to_string(self) -> str:
-        return str.join(";", [cell.to_string() for cell in self.all_cells])
-
 if __name__ == "__main__":
 
     with open("config.json") as config_file:
         config = load(config_file)
-        generate_images = config['generate_images']
-        generate_gif = config['generate_gif']
+        generate_images:bool = config['generate_images']
+        generate_gif:bool = config['generate_gif']
 
     if generate_images:
         print("Start generating images")
