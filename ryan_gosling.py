@@ -11,7 +11,6 @@ Matrix = TypeVar('Matrix')
 
 class Matrix:
 
-    happy_cells:List[Cell] = list()
     unhappy_cells:List[Cell] = list()
     empty_cells:List[Cell] = list()
     all_cells:List[Cell] = list()
@@ -51,7 +50,6 @@ class Matrix:
 
         [self.all_cells.append(self.Cell(self, position)) for position in range(0, self.size * self.size)]
         self.unhappy_cells = [cell for cell in self.all_cells if not cell.is_happy]
-        self.happy_cells = [cell for cell in self.all_cells if cell.is_happy]
         self.empty_cells = [cell for cell in self.all_cells if cell.color == "empty"]
 
     def get_cell_by_xy(self, x: int, y: int) -> Cell:
@@ -125,17 +123,14 @@ class Matrix:
                 matrix.unhappy_cells.append(self)
             else:
                 self.is_happy = True
-                matrix.happy_cells.append(self)
 
         def state_happiness(self) -> bool:
             if self.color == "empty":
                 return True
             new_is_happy = sum([self.color == neighbour.color for neighbour in self.get_neighbours()]) >= self.matrix.happiness_cup
             if new_is_happy != self.is_happy and self.is_happy:
-                self.matrix.happy_cells.remove(self)
                 self.matrix.unhappy_cells.append(self)
             elif new_is_happy != self.is_happy:
-                self.matrix.happy_cells.append(self)
                 self.matrix.unhappy_cells.remove(self)
             self.is_happy = new_is_happy
             return self.is_happy
@@ -161,7 +156,6 @@ class Matrix:
             (self.color, self.is_happy, empty_cell.color) = (empty_cell.color, True, self.color)
             self.matrix.empty_cells.remove(empty_cell)
             self.matrix.empty_cells.append(self)
-            self.matrix.happy_cells.append(self)
             self.matrix.unhappy_cells.remove(self)
             [neighbour.state_happiness() for neighbour in self.get_neighbours()]
             empty_cell.state_happiness()
